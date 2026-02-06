@@ -687,11 +687,7 @@ def main_interface():
 
         # عرض السؤال كرسالة مساعد (إذا لم يُعرض بعد)
         question_msg = f"**سؤال {current_step + 1}/{total_questions}:** {q['text']}"
-        already_shown = any(
-            m["content"] == question_msg and m["role"] == "assistant"
-            for m in st.session_state.chat_messages
-        )
-        if not already_shown:
+        if not st.session_state.chat_messages or st.session_state.chat_messages[-1]["content"] != question_msg:
             st.session_state.chat_messages.append({"role": "assistant", "content": question_msg})
             st.rerun()
 
@@ -713,6 +709,7 @@ def main_interface():
         answers = st.session_state.survey_answers
 
         # تحليل كل إجابة نصية جوهرية على حدة ثم أخذ المعدل
+        # الموديل ثنائي: [0]=غير راضي, [1]=راضي
         analysis_keys = ["q_experience", "q_preference", "q_ai"]
         all_predictions = []
 
@@ -727,24 +724,23 @@ def main_interface():
         if all_predictions:
             avg_prediction = np.mean(all_predictions, axis=0)
         else:
-            avg_prediction = np.array([0.33, 0.34, 0.33])
+            avg_prediction = np.array([0.5, 0.5])
 
+        # الموديل ثنائي: index 0 = غير راضي, index 1 = راضي
         class_idx = np.argmax(avg_prediction)
-
-        labels = {0: 'غير راضي 😞', 1: 'محايد 😐', 2: 'راضي 😃'}
-        result_text = labels[class_idx]
         confidence = np.max(avg_prediction) * 100
 
-        # Result banner
-        if class_idx == 2:
-            css_class = "result-positive"
-        elif class_idx == 0:
-            css_class = "result-negative"
-        else:
-            css_class = "result-neutral"
+        labels = {0: 'غير راضي 😞', 1: 'راضي 😃'}
+        result_text = labels[class_idx]
 
-        emoji_map = {0: '😞', 1: '😐', 2: '😃'}
-        label_map = {0: 'غير راضي', 1: 'محايد', 2: 'راضي'}
+        # Result banner
+        if class_idx == 1:
+            css_class = "result-positive"
+        else:
+            css_class = "result-negative"
+
+        emoji_map = {0: '😞', 1: '😃'}
+        label_map = {0: 'غير راضي', 1: 'راضي'}
 
         result_msg = f"نتيجة التحليل: {result_text} — الثقة: {confidence:.1f}%"
         already_result = any(m["content"] == result_msg for m in st.session_state.chat_messages)
