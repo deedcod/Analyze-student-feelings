@@ -1,4 +1,5 @@
 import argparse
+import os
 import subprocess
 import sys
 import time
@@ -13,6 +14,10 @@ def main() -> int:
 
     url = f"http://{args.address}:{args.port}"
 
+    # التأكد من تشغيل التطبيق من المجلد الصحيح
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    app_path = os.path.join(script_dir, "app.py")
+
     # Start Streamlit server.
     process = subprocess.Popen(
         [
@@ -20,7 +25,7 @@ def main() -> int:
             "-m",
             "streamlit",
             "run",
-            "app.py",
+            app_path,
             "--server.port",
             str(args.port),
             "--server.address",
