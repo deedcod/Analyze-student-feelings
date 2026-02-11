@@ -672,8 +672,8 @@ st.markdown("""
 FILE_NAME = "collected_responses.xlsx"
 
 # إعدادات تيليجرام (من متغيرات البيئة)
-TELEGRAM_BOT_TOKEN = os.getenv("8289972631:AAH8g7CIrYRqcYDBMp-gOBSn9DMGE-qiQxc")
-TELEGRAM_CHAT_ID = os.getenv("1566742277")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8289972631:AAH8g7CIrYRqcYDBMp-gOBSn9DMGE-qiQxc").strip()
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "1566742277").strip()
 
 ADMIN_CREDENTIALS = {
     "hisham": "a20a2b7bb0842d5cf8a0c06c626421fd51ec103925c1819a51271f2779afa730",  # password: '2005'
